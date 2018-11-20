@@ -61,6 +61,11 @@ def main(argv=sys.argv[1:]):
         nargs='+',
         help='Add packages to be tested. If not defined, all packages will be tested.')
     parser.add_argument(
+        '--Ignore_package_result',
+        required=False,
+        nargs='+',
+        help='Ignore de packages result.')
+    parser.add_argument(
         '--scope_folder',
         required=False,
         nargs=1,
@@ -497,7 +502,11 @@ def main(argv=sys.argv[1:]):
                 with open(os.path.join(log_package_dir, "stderr.log")) as f:
                     log_report=f.read()
                     if not log_report == "":
-                        #error_string="Error in test"
+                        if args.Ignore_package_result:
+                            if log_package not in args.Ignore_package_result:
+                                error_string+="Error in test: " + log_package + "\n"
+                        else:
+                            error_string="Error in test" + log_package + "\n"
                         sys.stdout.write("# BEGIN SECTION: Test error in: %s\n" % log_package)
                         sys.stdout.flush()
                         sys.stdout.write("test report:\n")
@@ -569,7 +578,7 @@ def main(argv=sys.argv[1:]):
 
 
     # Return success
-    if error_string==0:
+    if error_string=="":
         sys.stdout.write("Success!\n")
         sys.stdout.flush()
         return 0
