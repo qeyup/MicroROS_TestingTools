@@ -27,48 +27,56 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--Test_name',
         required=False,
-        nargs='+',
+        nargs='*',
+        default = "",
         help='Test name.')
     parser.add_argument(
         '--work_dir',
         required=False,
-        nargs='+',
+        nargs='*',
+        default = "",
         help='Work directory.')
     parser.add_argument(
         '--branch',
         required=False,
-        nargs=2,
+        nargs='*',
         action='append',
-        help='Specify testing branch (--branch package branch_to_set).')
+        help='Specify testing branch (--branch package1:branch_to_set1 package1:branch_to_set2 ...).')
     parser.add_argument(
         '--url',
         required=False,
-        nargs=1,
+        nargs='*',
+        default="",
         help='Specify the URL of the repos file.')
     parser.add_argument(
         '--file',
         required=False,
-        nargs=1,
+        nargs='*',
+        default="",
         help='Specify the path of the repos file. Specifies this field will invalidate the url field.')
     parser.add_argument(
         '--feature_to_test',
         required=False,
-        nargs=1,
+        nargs='*',
+        action='append',
         help='Specify the the feature to test.')
     parser.add_argument(
         '--packages_to_test',
         required=False,
-        nargs='+',
+        nargs='*',
+        action='append',
         help='Add packages to be tested. If not defined, all packages will be tested.')
     parser.add_argument(
         '--Ignore_package_result',
         required=False,
-        nargs='+',
+        nargs='*',
+        action='append',
         help='Ignore de packages result.')
     parser.add_argument(
         '--scope_folder',
         required=False,
-        nargs=1,
+        nargs='*',
+        default="",
         help='Folder where script will look for the repos.')
     parser.add_argument(
         '--skip_build',
@@ -97,23 +105,25 @@ def main(argv=sys.argv[1:]):
     parser.add_argument(
         '--Build_extra_args',
         required=False,
-        nargs='+',
+        nargs='*',
+        action='append',
         help='Add extra args to the build process.')
     parser.add_argument(
         '--Test_extra_args',
         required=False,
-        nargs='+',
+        nargs='*',
+        action='append',
         help='Add extra args to the test process.')
     parser.add_argument(
         '--Exec_command_after_build',
         required=False,
-        nargs='+',
+        nargs='*',
         action='append',
         help='Execute command after build. Execution path will be the workspace directory')
     parser.add_argument(
         '--Exec_command_after_test',
         required=False,
-        nargs='+',
+        nargs='*',
         action='append',
         help='Execute command after test. Execution path will be the workspace directory.')
     parser.add_argument(
@@ -126,8 +136,9 @@ def main(argv=sys.argv[1:]):
 
 
     # Set test name
-    if args.Test_name is not None:
-        sys.stdout.write("# BEGIN SECTION: TEST " + ' '.join(args.Test_name) + "\n\n")
+    Test_name = ' '.join(args.Test_name)
+    if Test_name != "":
+        sys.stdout.write("# BEGIN SECTION: TEST " + Test_name + "\n\n")
     else:
         sys.stdout.write("# BEGIN SECTION: TEST\n\n")
     sys.stdout.flush()
@@ -149,8 +160,8 @@ def main(argv=sys.argv[1:]):
     work_path=os.path.join(expanduser("~"), "ros2_ws")
 
     # Set work direcory
-    if args.work_dir is not None:
-        work_path=' '.join(args.work_dir)
+    work_path=' '.join(args.work_dir)
+    if work_path != "":
         sys.stdout.write("work dir set to: %s\n" % work_path)
         sys.stdout.flush()
 
@@ -184,10 +195,15 @@ def main(argv=sys.argv[1:]):
     sys.stdout.flush()
 
     if not args.skip_download:
-        if args.file is not None:
-            repo_file=args.file[0]
+        repo_file=' '.join(args.file)
+
+        if repo_file != "":
+            if not os.path.isfile(repo_file):
+                sys.stderr.write("Given repo file do not exists\n")
+                sys.stderr.flush()
+                return -1
         else:
-            if args.url is not None:
+            if len(args.url) > 0:
                 repo_file=os.path.join(work_path, "ros2.repos") 
                 sys.stdout.write("Download file from: %s\n" % args.url[0])
                 sys.stdout.flush()
@@ -227,9 +243,8 @@ def main(argv=sys.argv[1:]):
     sys.stdout.write("# BEGIN SECTION: Get all repo paths\n\n")
     sys.stdout.flush()
     repo_count = 0
-    scope_folder=src_path
-    if args.scope_folder is not None:
-        scope_folder=os.path.join(src_path, scope_folder) 
+    scope_folder=os.path.join(src_path, ' '.join(args.scope_folder)) 
+
     repo_list=[]
     for root, dirs, files in os.walk(scope_folder):
         for dir in dirs:
@@ -250,18 +265,23 @@ def main(argv=sys.argv[1:]):
     # Change to feature in all repos
     sys.stdout.write("# BEGIN SECTION: Set feature\n\n")
     sys.stdout.flush()
-    if args.feature_to_test is not None:
-
-        for repo in repo_list:
-            command="git -C " + "\"" + repo + "\"" + " checkout " + args.feature_to_test[0]
-            p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            out, err = p.communicate()
-            if p.returncode == 0:
-                sys.stdout.write(command)
-                sys.stdout.flush()
-                sys.stdout.write("`stdout:`\n" + out + "\n")
-                sys.stdout.flush()
-                sys.stdout.write("`stderr:`\n" + err + "\n")
+    if args.feature_to_test is not None and len(args.feature_to_test) > 0:
+        for feature_group in args.feature_to_test:
+            for feature in feature_group:
+                repo_changed=0
+                for repo in repo_list:
+                    command="git -C " + "\"" + repo + "\"" + " checkout " + feature
+                    p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    out, err = p.communicate()
+                    if p.returncode == 0:
+                        sys.stdout.write(command + "\n")
+                        sys.stdout.flush()
+                        sys.stdout.write("`stdout:`\n" + out + "\n")
+                        sys.stdout.flush()
+                        sys.stdout.write("`stderr:`\n" + err + "\n")
+                        sys.stdout.flush()
+                        repo_changed += 1
+                sys.stdout.write("%i of %i repos swithed to %s \n" % (repo_changed, repo_count, feature))
                 sys.stdout.flush()
 
     else:
@@ -276,9 +296,11 @@ def main(argv=sys.argv[1:]):
     # Change requested branches 
     sys.stdout.write("# BEGIN SECTION: Change branches\n\n")
     sys.stdout.flush()
-    if args.branch is not None:
-        for value in args.branch:
-            if value is not None:
+    if args.branch is not None and len(args.branch) > 0:
+        for branch_group in args.branch:
+            for branch in branch_group:
+                value=branch.split(":")
+                
                 tmp_repo_path=""
                 for repo_path in repo_list:
                     if value[0] == os.path.basename(repo_path):
@@ -299,11 +321,11 @@ def main(argv=sys.argv[1:]):
                         sys.stderr.flush()
                         return -1
                 else:
-                    sys.stderr.write("Repo '%s' not found" % value[0])
+                    sys.stderr.write("Repo '%s' not found" % value[0] + "\n")
                     sys.stderr.flush()
                     return -1
     else:
-        sys.stdout.write("No branches to be set")
+        sys.stdout.write("No branches to be set\n")
         sys.stdout.flush()
 
     # End section
@@ -316,13 +338,12 @@ def main(argv=sys.argv[1:]):
     sys.stdout.write("# BEGIN SECTION: Colcon build\n")
     sys.stdout.flush()
     if not args.skip_build:
-        colcon_args=""
+        Build_extra_args =[]
         if args.Build_extra_args is not None:
-            for value in args.Build_extra_args:
-                if value is not None:
-                    colcon_args += value + " "
-
-        command="colcon build " + colcon_args
+            for Build_extra_args_group in args.Build_extra_args:
+                for value in Build_extra_args_group:
+                    Build_extra_args.append(value)
+        command="colcon build " + ' '.join(Build_extra_args)
         sys.stdout.write(command + "\n")
         sys.stdout.flush()
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -381,9 +402,9 @@ def main(argv=sys.argv[1:]):
         sys.stdout.write("Setup file found in:" + local_setup_file + "\n")
         sys.stdout.flush()
     else:
-        sys.stderr.write("Setup file not found\n")
+        sys.stderr.write("Setup file not found in: " + local_setup_file + "\n")
         sys.stderr.flush()
-        return -1
+        #return -1
 
     # End section
     sys.stdout.write("# END SECTION\n\n\n")
@@ -393,7 +414,7 @@ def main(argv=sys.argv[1:]):
     # Execute commands
     sys.stdout.write("# BEGIN SECTION: Execute command in configured shell\n")
     sys.stdout.flush()
-    if args.Exec_command_after_build is not None:
+    if args.Exec_command_after_build is not None and len(args.Exec_command_after_build) > 0:
         for command in args.Exec_command_after_build:
             if command is not None:
                 command =  ' '.join(command)
@@ -446,24 +467,25 @@ def main(argv=sys.argv[1:]):
     # Genetare test string
     sys.stdout.write("# BEGIN SECTION: Colcon test\n")
     if not args.skip_test:
-        test_args = ""
-        if args.Test_extra_args is not None:
-            for value in args.Test_extra_args:
-                if value is not None:
-                    test_args += " " + value
-        
-        test_packages= ""
-        if args.packages_to_test is not None:
-            for value in args.packages_to_test:
-                if value is not None:
-                    test_packages += value + " "
 
         # Execute tests
         command="colcon test"
-        if not test_packages == "":
-            command+=" --packages-select " + test_packages
-        if not test_args == "":
-            command+=" " + test_args
+
+        packages_to_test = ""
+        if args.packages_to_test is not None:
+            for packages_to_test_group in args.packages_to_test:
+                packages_to_test += " " + ' '.join(packages_to_test_group)
+            if packages_to_test != "":
+                command+=" --packages-select " + packages_to_test
+
+        Test_extra_args =[]
+        if args.Test_extra_args is not None:
+            for Test_extra_args_group in args.Test_extra_args:
+                for value in Test_extra_args_group:
+                    Test_extra_args.append(value)
+
+        command+=" " + ' '.join(Test_extra_args)
+        
         sys.stdout.write(command + "\n")
         sys.stdout.flush()
 
@@ -490,6 +512,14 @@ def main(argv=sys.argv[1:]):
         sys.stdout.flush()
 
 
+        # Convert list
+        Ignore_package_result = []
+        if args.Ignore_package_result is not None:
+            for Ignore_group in args.Ignore_package_result:
+                for Ignore in Ignore_group:
+                    Ignore_package_result.append(Ignore)
+
+
         # Find log folder
         logs_path=os.path.join(work_path, "log")
         logs_pattern = os.path.join(logs_path, 'test_*')
@@ -501,12 +531,9 @@ def main(argv=sys.argv[1:]):
             if os.path.isdir(log_package_dir):
                 with open(os.path.join(log_package_dir, "stderr.log")) as f:
                     log_report=f.read()
-                    if not log_report == "":
-                        if args.Ignore_package_result:
-                            if log_package not in args.Ignore_package_result:
-                                error_string+="Error in test: " + log_package + "\n"
-                        else:
-                            error_string="Error in test" + log_package + "\n"
+                    if log_report != "":
+                        if log_package not in Ignore_package_result:
+                            error_string+="Error in test: " + log_package + "\n"
                         sys.stdout.write("# BEGIN SECTION: Test error in: %s\n" % log_package)
                         sys.stdout.flush()
                         sys.stdout.write("test report:\n")
@@ -528,7 +555,7 @@ def main(argv=sys.argv[1:]):
     # Execute commands
     sys.stdout.write("# BEGIN SECTION: Execute command in configured shell\n")
     sys.stdout.flush()
-    if args.Exec_command_after_test is not None:
+    if args.Exec_command_after_test is not None and len(args.Exec_command_after_test) > 0:
         for command in args.Exec_command_after_test:
             if command is not None:
                 command =  ' '.join(command)
