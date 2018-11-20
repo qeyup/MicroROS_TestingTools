@@ -1,0 +1,1 @@
+python /root/TestingTools/PythonScripts/MicroROS_AgentSide_Test.py --url https://raw.githubusercontent.com/microROS/micro-ROS-doc/master/repos/agent_minimum.repos --Exec_command_after_build "install/uros_agent/lib/uros_agent/uros_agent udp 8888"
