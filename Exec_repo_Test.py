@@ -353,7 +353,7 @@ def main(argv=sys.argv[1:]):
         if args.Build_extra_args is not None:
             for Build_extra_args_group in args.Build_extra_args:
                 for value in Build_extra_args_group:
-                    Build_extra_args.append(value)
+                    Build_extra_args.append(value.replace("+", "-"))
         command="colcon build " + ' '.join(Build_extra_args)
         custom_print(command + "\n")
         
@@ -486,7 +486,7 @@ def main(argv=sys.argv[1:]):
         if args.Test_extra_args is not None:
             for Test_extra_args_group in args.Test_extra_args:
                 for value in Test_extra_args_group:
-                    Test_extra_args.append(value)
+                    Test_extra_args.append(value.replace("+","-"))
 
         command+=" " + ' '.join(Test_extra_args)
         
