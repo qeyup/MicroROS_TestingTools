@@ -37,6 +37,18 @@ custom_print.new_output_line = ""
 custom_print.last_output_line = ""
 
 
+def convert_input_string(input_string):
+    if sys.platform.startswith('win'):
+        return input_string.encode()
+    else:
+        return input_string
+
+def convert_output_string(output_string):
+    if sys.platform.startswith('win'):
+        return output_string.decode()
+    else:
+        return output_string
+
 def main(argv=sys.argv[1:]):
 
     ssl._create_default_https_context = ssl._create_unverified_context
@@ -239,8 +251,8 @@ def main(argv=sys.argv[1:]):
         custom_print(command + "\n")
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         while p.poll() is None:
-            custom_print(p.stdout.read(1).decode())
-        custom_print(p.stdout.read().decode())
+            custom_print(convert_output_string(p.stdout.read(1)))
+        custom_print(convert_output_string(p.stdout.read()))
         if p.returncode != 0:
             sys.stderr.write("Download error\n")
             sys.stderr.flush()
@@ -292,8 +304,8 @@ def main(argv=sys.argv[1:]):
                     out, err = p.communicate()
                     if p.returncode == 0:
                         custom_print(command + "\n")
-                        custom_print("`stdout:`\n" + out.decode() + "\n")
-                        custom_print("`stderr:`\n" + err.decode() + "\n")
+                        custom_print("`stdout:`\n" + convert_output_string(out) + "\n")
+                        custom_print("`stderr:`\n" + convert_output_string(err) + "\n")
                         repo_changed += 1
                 custom_print("%i of %i repos swithed to %s \n" % (repo_changed, repo_count, feature))
                 
@@ -328,10 +340,9 @@ def main(argv=sys.argv[1:]):
                     
                     p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     out, err = p.communicate()
-                    custom_print("`stdout:`\n" + out.decode() + "\n")
-                    
-                    custom_print("`stderr:`\n" + err.decode() + "\n")
-                    
+                    custom_print("`stdout:`\n" + convert_output_string(out) + "\n")
+                    custom_print("`stderr:`\n" + convert_output_string(err) + "\n")
+
                     if p.returncode != 0:
                         sys.stderr.write("Switch branch error\n")
                         sys.stderr.flush()
@@ -365,9 +376,8 @@ def main(argv=sys.argv[1:]):
         
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         while p.poll() is None:
-            custom_print(p.stdout.read(1).decode())
-        custom_print(p.stdout.read().decode())
-
+            custom_print(convert_output_string(p.stdout.read(1)))
+        custom_print(convert_output_string(p.stdout.read()))
 
         if p.returncode != 0:
             sys.stderr.write("Build error\n")
@@ -405,7 +415,7 @@ def main(argv=sys.argv[1:]):
         custom_print("Windows\n")
 
         local_setup_file += ".bat"
-        local_setup_command = local_setup_file
+        local_setup_command = "cdm " + local_setup_file
         command_exec="cmd"
         command_exit="exit"
     else:
@@ -442,16 +452,17 @@ def main(argv=sys.argv[1:]):
 
                 # Configure enviroment variables
                 aux = local_setup_command + "\n"
-                p.stdin.write(aux.encode())
+                p.stdin.write(convert_input_string(aux))
 
                 # Execute user command
                 aux = command + "\n"
                 custom_print(aux)
-                p.stdin.write(aux.encode())
+                p.stdin.write(convert_input_string(aux))
+
 
                 # Close terminal
                 aux = command_exit + "\n"
-                p.stdin.write(aux.encode())
+                p.stdin.write(convert_input_string(aux))
 
                 # Wait
                 time.sleep(args.Exec_wait_time)
@@ -459,7 +470,7 @@ def main(argv=sys.argv[1:]):
                     custom_print("Command still running after %i seconds\n\n" % args.Exec_wait_time)
                 else:
                     custom_print("Command output:\n")
-                    custom_print(p.stdout.read().decode() + "\n\n")
+                    custom_print(convert_output_string(p.stdout.read()) + "\n\n")
                     custom_print("Command terminated after %i seconds\n" % args.Exec_wait_time)
                     custom_print("Return code: %i\n\n" % p.returncode)
 
@@ -505,8 +516,8 @@ def main(argv=sys.argv[1:]):
 
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         while p.poll() is None:
-            custom_print(p.stdout.read(1).decode())
-        custom_print(p.stdout.read().decode())
+            custom_print(convert_output_string(p.stdout.read(1)))
+        custom_print(convert_output_string(p.stdout.read()))
 
 
         # Execute report
@@ -514,8 +525,8 @@ def main(argv=sys.argv[1:]):
         command="colcon test-result"
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         while p.poll() is None:
-            custom_print(p.stdout.read(1).decode())
-        custom_print(p.stdout.read().decode())
+            custom_print(convert_output_string(p.stdout.read(1)))
+        custom_print(convert_output_string(p.stdout.read()))
 
         # End section
         custom_print("# END SECTION\n\n\n")
@@ -572,16 +583,16 @@ def main(argv=sys.argv[1:]):
 
                 # Configure enviroment variables
                 aux = local_setup_command + "\n"
-                p.stdin.write(aux.encode())
+                p.stdin.write(convert_input_string(aux))
 
                 # Execute user command
                 aux=command + "\n"
                 custom_print(aux)
-                p.stdin.write(aux.encode())
+                p.stdin.write(convert_input_string(aux))
 
                 # Close terminal
                 aux=command_exit + "\n"
-                p.stdin.write(aux.encode())
+                p.stdin.write(convert_input_string(aux))
 
                 # Wait
                 time.sleep(args.Exec_wait_time)
@@ -589,7 +600,7 @@ def main(argv=sys.argv[1:]):
                     custom_print("Command still running after %i seconds\n\n" % args.Exec_wait_time)
                 else:
                     custom_print("Command output:\n")
-                    custom_print(p.stdout.read().decode() + "\n\n")
+                    custom_print(convert_output_string(p.stdout.read()) + "\n\n")
                     custom_print("Command terminated after %i seconds\n" % args.Exec_wait_time)
                     custom_print("Return code: %i\n\n" % p.returncode)
 
