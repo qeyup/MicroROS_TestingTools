@@ -26,7 +26,7 @@ def custom_print(out_string):
             custom_print.new_output_line=""
 
         # To avoid duplicated lines
-        if not custom_print.last_output_line.startswith(custom_print.new_output_line):
+        if not custom_print.last_output_line.startswith(custom_print.new_output_line) or custom_print.new_output_line == "\n":
             sys.stdout.write(custom_print.discard_output_chars+c)
             sys.stdout.flush()
             custom_print.discard_output_chars=""
@@ -48,6 +48,15 @@ def convert_output_string(output_string):
         return output_string.decode()
     else:
         return output_string
+
+def generate_start_tag(title):
+    out="# BEGIN SECTION: " + title + "\n\n"
+    custom_print(out)
+
+def generate_end_tag():
+    out = "# END SECTION\n\n\n"
+    custom_print(out) 
+
 
 def main(argv=sys.argv[1:]):
 
@@ -172,25 +181,20 @@ def main(argv=sys.argv[1:]):
     # Set test name
     Test_name = ' '.join(args.Test_name)
     if Test_name != "":
-        custom_print("# BEGIN SECTION: TEST " + Test_name + "\n\n")
+        generate_start_tag(Test_name)
     else:
-        custom_print("# BEGIN SECTION: TEST\n\n")
-    
+        generate_start_tag("Test")
 
 
     # Parse args
-    custom_print("# BEGIN SECTION: Parse args\n\n")
-    
+    generate_start_tag("Parse args")
     custom_print('\n'.join(argv)  + "\n")
-    
-    custom_print("# END SECTION\n\n\n")
-    
+    generate_end_tag()
+
 
 
     # Set enviroment
-    custom_print("# BEGIN SECTION: Set enviroment\n\n")
-    
-    
+    generate_start_tag("Set enviroment")
     work_path=os.path.join(expanduser("~"), "ros2_ws")
 
     # Set work direcory
@@ -217,13 +221,11 @@ def main(argv=sys.argv[1:]):
         custom_print("Created folder: %s\n" % src_path)
 
     # End section
-    custom_print("# END SECTION\n\n\n")
-    
+    generate_end_tag()
 
 
     # Download repos
-    custom_print("# BEGIN SECTION: Download repos\n\n")
-    
+    generate_start_tag("Download repos")
 
     if not args.skip_download:
         repo_file=' '.join(args.file)
@@ -260,15 +262,13 @@ def main(argv=sys.argv[1:]):
 
     else:
         custom_print("Skipped\n")
-        
 
     # End section
-    custom_print("# END SECTION\n\n\n")
-    
+    generate_end_tag()
 
 
     # Get all repos folder
-    custom_print("# BEGIN SECTION: Get all repo paths\n\n")
+    generate_start_tag("Get all repo path")
     
     repo_count = 0
     scope_folder=os.path.join(src_path, ' '.join(args.scope_folder)) 
@@ -282,15 +282,13 @@ def main(argv=sys.argv[1:]):
                 repo_list.append(root)
 
     custom_print("Found %i repos paths\n" % repo_count)
-    
 
     # End section
-    custom_print("# END SECTION\n\n\n")
-    
+    generate_end_tag()
 
 
     # Change to feature in all repos
-    custom_print("# BEGIN SECTION: Set feature\n\n")
+    generate_start_tag("Set feature")
     
     if args.feature_to_test is not None and len(args.feature_to_test) > 0:
         for feature_group in args.feature_to_test:
@@ -308,20 +306,17 @@ def main(argv=sys.argv[1:]):
                         custom_print("`stderr:`\n" + convert_output_string(err) + "\n")
                         repo_changed += 1
                 custom_print("%i of %i repos swithed to %s \n" % (repo_changed, repo_count, feature))
-                
 
     else:
         custom_print("No feature to be set\n")
 
 
     # End section
-    custom_print("# END SECTION\n\n\n")
-    
+    generate_end_tag()
 
 
     # Change requested branches 
-    custom_print("# BEGIN SECTION: Change branches\n\n")
-    
+    generate_start_tag("Change branches")
     if args.branch is not None and len(args.branch) > 0:
         for branch_group in args.branch:
             for branch in branch_group:
@@ -355,13 +350,11 @@ def main(argv=sys.argv[1:]):
         custom_print("No branches to be set\n")
 
     # End section
-    custom_print("# END SECTION")
-    
-    custom_print("\n\n")
+    generate_end_tag()
 
 
     # Build
-    custom_print("# BEGIN SECTION: Colcon build\n")
+    generate_start_tag("Colcon build")
     
     if not args.skip_build:
         Build_extra_args =[]
@@ -386,20 +379,16 @@ def main(argv=sys.argv[1:]):
     else:
         custom_print("Skipped\n")
 
-
     # End section
-    custom_print("# END SECTION\n\n\n")
-    
+    generate_end_tag()
 
 
     # Check locak setup file
-    custom_print("# BEGIN SECTION: Check local setup file\n")
-    
+    generate_start_tag("Check local setup file")
 
     # Display platform
     custom_print("Platform: " + sys.platform + "\n")
     custom_print("Type: " + os.name + "\n")
-    
 
     # Configure path
     local_setup_file=os.path.join(os.path.join(work_path, "install"), "local_setup")
@@ -432,12 +421,12 @@ def main(argv=sys.argv[1:]):
         #return -1
 
     # End section
-    custom_print("# END SECTION\n\n\n")
+    generate_end_tag()
     
 
 
     # Execute commands
-    custom_print("# BEGIN SECTION: Execute command in configured shell\n")
+    generate_start_tag("Execute command in configured shell")
     
     if args.Exec_command_after_build is not None and len(args.Exec_command_after_build) > 0:
         for command in args.Exec_command_after_build:
@@ -445,7 +434,7 @@ def main(argv=sys.argv[1:]):
                 continue
             if command is not None:
                 command =  ' '.join(command)
-                custom_print("# BEGIN SECTION: Exec: " + command + "\n")
+                generate_start_tag("Exec: " + command)
 
                 # Open terminal
                 p = subprocess.Popen(command_exec, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
@@ -475,7 +464,7 @@ def main(argv=sys.argv[1:]):
                     custom_print("Return code: %i\n\n" % p.returncode)
 
                 # End section
-                custom_print("# END SECTION\n\n\n")
+                generate_end_tag()
 
                 # Change working path
                 os.chdir(work_path)
@@ -484,13 +473,11 @@ def main(argv=sys.argv[1:]):
 
 
     # End section
-    custom_print("# END SECTION\n\n\n")
-    
-
+    generate_end_tag()
 
 
     # Genetare test string
-    custom_print("# BEGIN SECTION: Colcon test\n")
+    generate_start_tag("Colcon test")
     if not args.skip_test:
 
         # Execute tests
@@ -521,7 +508,7 @@ def main(argv=sys.argv[1:]):
 
 
         # Execute report
-        custom_print("# BEGIN SECTION: General report\n")
+        generate_start_tag("General report")
         command="colcon test-result"
         p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         while p.poll() is None:
@@ -529,7 +516,7 @@ def main(argv=sys.argv[1:]):
         custom_print(convert_output_string(p.stdout.read()))
 
         # End section
-        custom_print("# END SECTION\n\n\n")
+        generate_end_tag()
 
 
         # Convert list
@@ -554,21 +541,21 @@ def main(argv=sys.argv[1:]):
                     if log_report != "":
                         if log_package not in Ignore_package_result:
                             error_string+="Error in test: " + log_package + "\n"
-                        custom_print("# BEGIN SECTION: Test error in: %s\n" % log_package)
+                        generate_start_tag("Test error in: %s" % log_package)
                         custom_print("test report:\n")
                         with open(os.path.join(log_package_dir, "stdout.log")) as full_report:
                             custom_print(full_report.read())
 
                         # End section
-                        custom_print("# END SECTION\n\n\n")
+                        generate_end_tag()
 
 
     # End section
-    custom_print("# END SECTION\n\n\n")
+    generate_end_tag()
 
 
     # Execute commands
-    custom_print("# BEGIN SECTION: Execute command in configured shell\n")
+    generate_start_tag("Execute command in configured shell")
     
     if args.Exec_command_after_test is not None and len(args.Exec_command_after_test) > 0:
         for command in args.Exec_command_after_test:
@@ -576,7 +563,7 @@ def main(argv=sys.argv[1:]):
                 continue
             if command is not None:
                 command =  ' '.join(command)
-                custom_print("# BEGIN SECTION: Exec: " + command + "\n")
+                generate_start_tag("Exec: " + command)
 
                 # Open terminal
                 p = subprocess.Popen(command_exec, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
@@ -605,7 +592,7 @@ def main(argv=sys.argv[1:]):
                     custom_print("Return code: %i\n\n" % p.returncode)
 
                 # End section
-                custom_print("# END SECTION\n\n\n")
+                generate_end_tag()
 
 
                 # Change working path
@@ -615,7 +602,7 @@ def main(argv=sys.argv[1:]):
 
 
     # End section
-    custom_print("# END SECTION\n\n\n")
+    generate_end_tag()
 
 
     # Return success
