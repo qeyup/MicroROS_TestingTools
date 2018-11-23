@@ -18,7 +18,7 @@ CLIENT_BUILD_SHARED_LIBS="ON"
 
 
 #Execute script with arguments
-python Exec_repo_Test.py    --work_dir "${PWD}/Agent_ws" \
+python Exec_repo_Test.py    --work_dir "~/Agent_ws" \
                             --scope_folder ${AGENT_UROS_PATH} \
                             --url ${AGENT_REPO_LIST_URL} \
                             --file \
@@ -32,7 +32,7 @@ python Exec_repo_Test.py    --work_dir "${PWD}/Agent_ws" \
                             --Build_extra_args 
 Agent_test=$?
 
-python Exec_repo_Test.py    --work_dir "${PWD}/Client_ws" \
+python Exec_repo_Test.py    --work_dir "~/Client_ws" \
                             --scope_folder ${CLIENT_UROS_PATH} \
                             --url ${CLIENT_REPO_LIST_URL} \
                             --file \

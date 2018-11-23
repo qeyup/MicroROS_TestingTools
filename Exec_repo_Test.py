@@ -239,10 +239,13 @@ def main(argv=sys.argv[1:]):
 
         command="vcs-import " + "src" + " < " + "\"" + repo_file + "\""
         custom_print(command + "\n")
-        p = subprocess.Popen(command, shell=True, encoding='ascii', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        try:
+            p = subprocess.Popen(command, shell=True, encoding='ascii', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        except:
+            p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         while p.poll() is None:
             custom_print(p.stdout.read(1))
-        custom_print((p.stdout.read())
+        custom_print(p.stdout.read())
         if p.returncode != 0:
             sys.stderr.write("Download error\n")
             sys.stderr.flush()
@@ -285,7 +288,10 @@ def main(argv=sys.argv[1:]):
                 repo_changed=0
                 for repo in repo_list:
                     command="git -C " + "\"" + repo + "\"" + " checkout " + feature
-                    p = subprocess.Popen(command, shell=True, encoding='ascii', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    try:
+                        p = subprocess.Popen(command, shell=True, encoding='ascii', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    except:
+                        p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     out, err = p.communicate()
                     if p.returncode == 0:
                         custom_print(command + "\n")
@@ -320,7 +326,10 @@ def main(argv=sys.argv[1:]):
                     command="git -C " + "\"" + repo_path + "\"" + " checkout " + value[1]
                     custom_print(command + "\n")
                     
-                    p = subprocess.Popen(command, shell=True, encoding='ascii', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    try:
+                        p = subprocess.Popen(command, shell=True, encoding='ascii', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    except:
+                        p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     out, err = p.communicate()
                     custom_print("`stdout:`\n" + out + "\n")
                     custom_print("`stderr:`\n" + err + "\n")
@@ -353,11 +362,14 @@ def main(argv=sys.argv[1:]):
                     Build_extra_args.append(value.replace("+", "-"))
         command="colcon build " + ' '.join(Build_extra_args)
         custom_print(command + "\n")
-        
-        p = subprocess.Popen(command, shell=True, encoding='ascii', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+        try:
+            p = subprocess.Popen(command, shell=True, encoding='ascii', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        except:
+            p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         while p.poll() is None:
             custom_print(p.stdout.read(1))
-        custom_print((p.stdout.read())
+        custom_print(p.stdout.read())
 
         if p.returncode != 0:
             sys.stderr.write("Build error\n")
@@ -423,7 +435,10 @@ def main(argv=sys.argv[1:]):
             generate_start_tag("Exec: " + command)
 
             # Open terminal
-            p = subprocess.Popen(command_exec, shell=True, encoding='ascii', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
+            try:
+                p = subprocess.Popen(command_exec, shell=True, encoding='ascii', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
+            except:
+                p = subprocess.Popen(command_exec, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
 
             # Configure enviroment variables
             p.stdin.write(local_setup_command + "\n")
@@ -486,7 +501,10 @@ def main(argv=sys.argv[1:]):
         
         custom_print(command + "\n")
 
-        p = subprocess.Popen(command, shell=True, encoding='ascii', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        try:
+            p = subprocess.Popen(command, shell=True, encoding='ascii', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        except:
+            p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         while p.poll() is None:
             custom_print(p.stdout.read(1))
         custom_print(p.stdout.read())
@@ -495,7 +513,10 @@ def main(argv=sys.argv[1:]):
         # Execute report
         generate_start_tag("General report")
         command="colcon test-result"
-        p = subprocess.Popen(command, shell=True, encoding='ascii', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        try:
+            p = subprocess.Popen(command, shell=True, encoding='ascii', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        except:
+            p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         while p.poll() is None:
             custom_print(p.stdout.read(1))
         custom_print(p.stdout.read())
@@ -550,7 +571,10 @@ def main(argv=sys.argv[1:]):
             generate_start_tag("Exec: " + command)
 
             # Open terminal
-            p = subprocess.Popen(command_exec, shell=True, encoding='ascii', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
+            try:
+                p = subprocess.Popen(command_exec, shell=True, encoding='ascii', stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
+            except:
+                p = subprocess.Popen(command_exec, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
 
             # Configure enviroment variables
             p.stdin.write(local_setup_command + "\n")
