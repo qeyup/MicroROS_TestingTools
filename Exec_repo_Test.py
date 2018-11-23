@@ -19,12 +19,6 @@ def custom_print(out_string):
     for c in out_string:
         custom_print.new_output_line+= c
 
-        # New line
-        if c == '\n':
-            custom_print.last_output_line=custom_print.new_output_line
-            custom_print.discard_output_chars=""
-            custom_print.new_output_line=""
-
         # To avoid duplicated lines
         if not custom_print.last_output_line.startswith(custom_print.new_output_line) or custom_print.new_output_line == "\n":
             sys.stdout.write(custom_print.discard_output_chars+c)
@@ -32,6 +26,12 @@ def custom_print(out_string):
             custom_print.discard_output_chars=""
         else:
             custom_print.discard_output_chars+=c 
+
+        # New line
+        if c == '\n':
+            custom_print.last_output_line=custom_print.new_output_line
+            custom_print.discard_output_chars=""
+            custom_print.new_output_line=""
 custom_print.discard_output_chars = ""
 custom_print.new_output_line = ""
 custom_print.last_output_line = ""
