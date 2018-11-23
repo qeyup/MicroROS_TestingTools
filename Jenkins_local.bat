@@ -15,7 +15,7 @@ set CLIENT_BUILD_SHARED_LIBS="ON"
 
 :-------------------------------------------------------------------------------------------------------------------
 
-set python_script="https://raw.githubusercontent.com/qeyup/MicroROS_TestingTools/feature/splitRepos/Exec_repo_Test.py"
+set python_script="https://raw.githubusercontent.com/qeyup/MicroROS_TestingTools/master/Exec_repo_Test.py"
 curl %python_script% -o C:\Exec.py
 
 python C:\Exec.py   --work_dir "C:\A" \
