@@ -20,7 +20,7 @@ CLIENT_BUILD_SHARED_LIBS="ON"
 
 
 # Download python test script
-python_script="https://raw.githubusercontent.com/qeyup/MicroROS_TestingTools/feature/splitRepos/Exec_repo_Test.py"
+python_script="https://raw.githubusercontent.com/qeyup/MicroROS_TestingTools/master/Exec_repo_Test.py"
 wget ${python_script}  -O $HOME/Exec.py
 
 
