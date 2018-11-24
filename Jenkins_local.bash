@@ -1,17 +1,17 @@
 #!/bin/bash
 
-FEATURE_TO_TEST="develop"
+FEATURE_TO_TEST="master"
 
 AGENT_REPO_LIST_URL="https://raw.githubusercontent.com/microROS/micro-ROS-doc/master/repos/agent_minimum.repos"
 AGENT_UROS_PATH="uros"
 AGENT_PACKAGES_TO_TEST=""
-AGENT_IGNORE_PACKAGE_RESULT="ament_tools osrf_pycommon ament_copyright ament_lint_cmake ament_package ament_pep257 rcl rcutils rosidl_generator_cpp rosidl_parser"
+AGENT_IGNORE_PACKAGE_RESULT="ament_copyright ament_lint_cmake ament_package ament_pep257 microxrcedds_agent_cmake_module rcl rcutils rosidl_generator_cpp rosidl_parser"
 AGENT_SET_BRANCHES=""
 
 CLIENT_REPO_LIST_URL="https://raw.githubusercontent.com/microROS/micro-ROS-doc/master/repos/client_minimum.repos"
 CLIENT_UROS_PATH="uros"
 CLIENT_PACKAGES_TO_TEST=""
-CLIENT_IGNORE_PACKAGE_RESULT="ament_tools osrf_pycommon ament_copyright ament_lint_cmake ament_package ament_pep257 rcl_lifecycle rcl rclcpp rcutils rmw_microxrcedds rosidl_generator_cpp rosidl_parser"
+CLIENT_IGNORE_PACKAGE_RESULT="ament_copyright ament_lint_cmake ament_package ament_pep257 builtin_interfaces diagnostic_msgs geometry_msgs lifecycle_msgs nav_msgs rcl rclcpp rclcpp_lifecycle rcutils rosidl_generator_cpp rosidl_parser rosidl_typesupport_microxrcedds_shared sensor_msgs std_msgs std_srvs test_msgs"
 CLIENT_SET_BRANCHES=""
 CLIENT_BUILD_SHARED_LIBS="ON"
 
