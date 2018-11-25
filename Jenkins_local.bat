@@ -1,22 +1,23 @@
-set FEATURE_TO_TEST="develop"
+set FEATURE_TO_TEST="master"
 
 set AGENT_REPO_LIST_URL="https://raw.githubusercontent.com/microROS/micro-ROS-doc/master/repos/agent_minimum.repos"
 set AGENT_UROS_PATH="uros"
 set AGENT_PACKAGES_TO_TEST=""
-set AGENT_IGNORE_PACKAGE_RESULT="ament_tools osrf_pycommon ament_copyright ament_lint_cmake ament_package ament_pep257 rcl rcutils rosidl_generator_cpp rosidl_parser"
+set AGENT_IGNORE_PACKAGE_RESULT="ament_copyright ament_lint_cmake ament_package ament_pep257 microxrcedds_agent_cmake_module rcl rcutils rosidl_generator_cpp rosidl_parser"
 set AGENT_SET_BRANCHES=""
 
 set CLIENT_REPO_LIST_URL="https://raw.githubusercontent.com/microROS/micro-ROS-doc/master/repos/client_minimum.repos"
 set CLIENT_UROS_PATH="uros"
 set CLIENT_PACKAGES_TO_TEST=""
-set CLIENT_IGNORE_PACKAGE_RESULT="ament_tools osrf_pycommon ament_copyright ament_lint_cmake ament_package ament_pep257 rcl_lifecycle rcl rclcpp rcutils rmw_microxrcedds rosidl_generator_cpp rosidl_parser"
+set CLIENT_IGNORE_PACKAGE_RESULT="ament_copyright ament_lint_cmake ament_package ament_pep257 builtin_interfaces diagnostic_msgs geometry_msgs lifecycle_msgs nav_msgs rcl rclcpp rclcpp_lifecycle rcutils rosidl_generator_cpp rosidl_parser rosidl_typesupport_microxrcedds_shared sensor_msgs std_msgs std_srvs test_msgs"
 set CLIENT_SET_BRANCHES=""
 set CLIENT_BUILD_SHARED_LIBS="ON"
 
 :-------------------------------------------------------------------------------------------------------------------
 
-set python_script="https://raw.githubusercontent.com/qeyup/MicroROS_TestingTools/master/Exec_repo_Test.py"
-curl %python_script% -o C:\Exec.py
+:set python_script="https://raw.githubusercontent.com/qeyup/MicroROS_TestingTools/master/Exec_repo_Test.py"
+:curl %python_script% -o C:\Exec.py
+copy Exec_repo_Test.py C:\Exec.py
 
 python C:\Exec.py   --work_dir "C:\A" ^
                     --scope_folder %AGENT_UROS_PATH% ^
@@ -25,7 +26,6 @@ python C:\Exec.py   --work_dir "C:\A" ^
                     --Test_name "Agent test" ^
                     --feature_to_test %FEATURE_TO_TEST% ^
                     --branch %CLIENT_SET_BRANCHES% ^
-                    --Exec_command_after_build "dir" ^
                     --Exec_command_after_build "C:\A\install\Lib\uros_agent\uros_agent.exe udp 8888" ^
                     --Ignore_package_result %AGENT_IGNORE_PACKAGE_RESULT% ^
                     --packages_to_test %AGENT_PACKAGES_TO_TEST% ^
@@ -42,7 +42,7 @@ python C:\Exec.py   --work_dir "C:\C" ^
                     --feature_to_test %FEATURE_TO_TEST% ^
                     --branch %CLIENT_SET_BRANCHES% ^
                     --Exec_command_after_build ^
-                    --Ignore_package_result :%CLIENT_IGNORE_PACKAGE_RESULT% ^
+                    --Ignore_package_result %CLIENT_IGNORE_PACKAGE_RESULT% ^
                     --packages_to_test %CLIENT_PACKAGES_TO_TEST% ^
                     --Test_extra_args "++merge+install" ^
                     --Build_extra_args "--cmake-args -DBUILD_SHARED_LIBS=%CLIENT_BUILD_SHARED_LIBS% ++merge+install" 
