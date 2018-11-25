@@ -305,12 +305,11 @@ def main(argv=sys.argv[1:]):
 
     # Change to feature in all repos
     tags_gen.start("Set feature")
+    repo_changed=0
     if args.feature_to_test is not None and len(args.feature_to_test) > 0:
         for feature_group in args.feature_to_test:
-            for feature in feature_group:
-                if feature == "":
-                    continue
-                repo_changed=0
+            feature_list = ' '.join(feature_group)
+            for feature in feature_list.split():
                 for repo in repo_list:
                     command="git -C " + "\"" + repo + "\"" + " checkout " + feature
                     try:
@@ -323,7 +322,7 @@ def main(argv=sys.argv[1:]):
                         custom_output.std_print("`stdout:`\n" + out + "\n")
                         custom_output.std_print("`stderr:`\n" + err + "\n")
                         repo_changed += 1
-                custom_output.std_print("%i of %i repos swithed to %s \n" % (repo_changed, repo_count, feature))
+        custom_output.std_print("%i of %i repos swithed to %s \n" % (repo_changed, repo_count, feature))
 
     else:
         custom_output.std_print("No feature to be set\n")
@@ -337,15 +336,15 @@ def main(argv=sys.argv[1:]):
     tags_gen.start("Change branches")
     if args.branch is not None and len(args.branch) > 0:
         for branch_group in args.branch:
-            for branch in branch_group:
-                if branch == "":
-                    continue
+            branch_group_list = ' '.join(branch_group)
+            for branch in branch_group_list.split():
                 value=branch.split(":")
 
                 tmp_repo_path=""
                 for repo_path in repo_list:
                     if value[0] == os.path.basename(repo_path):
                         tmp_repo_path = repo_path
+                        break
 
                 if tmp_repo_path != "":
                     command="git -C " + "\"" + repo_path + "\"" + " checkout " + value[1]
@@ -554,7 +553,8 @@ def main(argv=sys.argv[1:]):
         Ignore_package_result = []
         if args.Ignore_package_result is not None:
             for Ignore_group in args.Ignore_package_result:
-                for Ignore in Ignore_group:
+                Ignore_list = ' '.join(Ignore_group)
+                for Ignore in Ignore_list.split():
                     Ignore_package_result.append(Ignore)
 
 
@@ -572,7 +572,7 @@ def main(argv=sys.argv[1:]):
                     if log_report.find("Errors while running CTest") != -1:
                         if log_package not in Ignore_package_result:
                             error_string+="Error in test: " + log_package + "\n"
-                    
+
                     tags_gen.start("Test report (%s)" % log_package)
                     custom_output.std_print("stderr.log:\n")
                     custom_output.std_print(log_report + "\n\n")
