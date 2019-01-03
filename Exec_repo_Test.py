@@ -550,36 +550,36 @@ def main(argv=sys.argv[1:]):
 
 
         # Convert list
-        Ignore_package_result = []
-        if args.Ignore_package_result is not None:
-            for Ignore_group in args.Ignore_package_result:
-                Ignore_list = ' '.join(Ignore_group)
-                for Ignore in Ignore_list.split():
-                    Ignore_package_result.append(Ignore)
+        #Ignore_package_result = []
+        #if args.Ignore_package_result is not None:
+        #    for Ignore_group in args.Ignore_package_result:
+        #        Ignore_list = ' '.join(Ignore_group)
+        #        for Ignore in Ignore_list.split():
+        #            Ignore_package_result.append(Ignore)
 
 
         # Find log folder
-        logs_path=os.path.join(work_path, "log")
-        logs_pattern = os.path.join(logs_path, 'test_*')
-        sorted_logs = sorted(
-            glob.iglob(logs_pattern), key=os.path.getctime, reverse=True) 
-        last_log_path = os.path.join(logs_path, sorted_logs[0])
-        for log_package in os.listdir(last_log_path):
-            log_package_dir=os.path.join(last_log_path,log_package)
-            if os.path.isdir(log_package_dir):
-                with open(os.path.join(log_package_dir, "stderr.log")) as f:
-                    log_report=f.read()
-                    if log_report.find("Errors while running CTest") != -1:
-                        if log_package not in Ignore_package_result:
-                            error_string+="Error in test: " + log_package + "\n"
+        #logs_path=os.path.join(work_path, "log")
+        #logs_pattern = os.path.join(logs_path, 'test_*')
+        #sorted_logs = sorted(
+        #    glob.iglob(logs_pattern), key=os.path.getctime, reverse=True) 
+        #last_log_path = os.path.join(logs_path, sorted_logs[0])
+        #for log_package in os.listdir(last_log_path):
+        #    log_package_dir=os.path.join(last_log_path,log_package)
+        #    if os.path.isdir(log_package_dir):
+        #        with open(os.path.join(log_package_dir, "stderr.log")) as f:
+        #            log_report=f.read()
+        #            if log_report.find("Errors while running CTest") != -1:
+        #                if log_package not in Ignore_package_result:
+        #                    error_string+="Error in test: " + log_package + "\n"
 
-                    tags_gen.start("Test report (%s)" % log_package)
-                    custom_output.std_print("stderr.log:\n")
-                    custom_output.std_print(log_report + "\n\n")
-                    custom_output.std_print("stdout.log:\n")
-                    with open(os.path.join(log_package_dir, "stdout.log")) as full_report:
-                        custom_output.std_print(full_report.read() + "\n\n")
-                    tags_gen.end()
+        #            tags_gen.start("Test report (%s)" % log_package)
+        #            custom_output.std_print("stderr.log:\n")
+        #            custom_output.std_print(log_report + "\n\n")
+        #            custom_output.std_print("stdout.log:\n")
+        #            with open(os.path.join(log_package_dir, "stdout.log")) as full_report:
+        #                custom_output.std_print(full_report.read() + "\n\n")
+        #            tags_gen.end()
 
 
     # End section
