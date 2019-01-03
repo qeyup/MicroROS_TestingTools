@@ -6,6 +6,7 @@ import ssl
 import glob
 import subprocess
 import time
+import tarfile
 
 try:
     import urllib.request
@@ -188,6 +189,12 @@ def main(argv=sys.argv[1:]):
         nargs=1,
         default=5,
         help='Wait time after exe comand.')
+    parser.add_argument(
+        '--Compress_log',
+        required=False,
+        default=False,
+        action='store_true',
+        help='Indicate if compress log folder.')
     args = parser.parse_args(argv)
 
 
@@ -580,6 +587,14 @@ def main(argv=sys.argv[1:]):
         #            with open(os.path.join(log_package_dir, "stdout.log")) as full_report:
         #                custom_output.std_print(full_report.read() + "\n\n")
         #            tags_gen.end()
+
+
+
+        if args.Compress_log:
+            tar = tarfile.open("log.tar.gz", "w:gz")
+            tar.add("log", arcname="log")
+            tar.close()
+            shutil.rmtree("log")
 
 
     # End section
