@@ -588,17 +588,16 @@ def main(argv=sys.argv[1:]):
         #                custom_output.std_print(full_report.read() + "\n\n")
         #            tags_gen.end()
 
-
-
-        if args.Compress_log:
-            tar = tarfile.open("log.tar.gz", "w:gz")
-            tar.add("log", arcname="log")
-            tar.close()
-            shutil.rmtree("log")
-
-
     # End section
     tags_gen.end()
+
+
+    # Compress log
+    if args.Compress_log:
+        tar = tarfile.open("log.tar.gz", "w:gz")
+        tar.add("log", arcname="log")
+        tar.close()
+        shutil.rmtree("log")
 
 
     # Execute commands
