@@ -541,6 +541,12 @@ def main(argv=sys.argv[1:]):
         custom_output.std_print(p.stdout.read())
 
 
+        if p.returncode != 0:
+            sys.stderr.write("Test error\n")
+            sys.stderr.flush()
+            return -1
+
+
         # Execute report
         tags_gen.start("General report")
         command="colcon test-result"
