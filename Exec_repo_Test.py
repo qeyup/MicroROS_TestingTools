@@ -390,7 +390,7 @@ def main(argv=sys.argv[1:]):
                 for value in Build_extra_args_group:
                     if value == "":
                         continue
-                    Build_extra_args.append(value.replace("+", "-"))
+                    Build_extra_args.append(value.replace("#", ""))
         command="colcon build " + ' '.join(Build_extra_args)
         custom_output.std_print(command + "\n")
 
@@ -526,7 +526,7 @@ def main(argv=sys.argv[1:]):
         if args.Test_extra_args is not None:
             for Test_extra_args_group in args.Test_extra_args:
                 for value in Test_extra_args_group:
-                    Test_extra_args.append(value.replace("+","-"))
+                    Test_extra_args.append(value.replace("#",""))
 
         command+=" " + ' '.join(Test_extra_args)
         
@@ -539,6 +539,12 @@ def main(argv=sys.argv[1:]):
         while p.poll() is None:
             custom_output.std_print(p.stdout.read(1))
         custom_output.std_print(p.stdout.read())
+
+
+        if p.returncode != 0:
+            sys.stderr.write("Test error\n")
+            sys.stderr.flush()
+            return -1
 
 
         # Execute report
