@@ -74,6 +74,7 @@ def main(argv=sys.argv[1:]):
 
     tags_gen = tags_generator()
     ok_string = "success"
+    script_version="0.1.0"
 
     ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -197,6 +198,10 @@ def main(argv=sys.argv[1:]):
         help='Indicate if compress log folder.')
     args = parser.parse_args(argv)
 
+    # Print version
+    tags_gen.start("Script version")
+    custom_output.std_print("%s\n" % script_version)
+    tags_gen.end()
 
     # Set test name
     Test_name = ' '.join(args.Test_name)
@@ -205,13 +210,10 @@ def main(argv=sys.argv[1:]):
     else:
         tags_gen.start("Test")
 
-
     # Parse args
     tags_gen.start("Parse args")
     custom_output.std_print('\n'.join(argv)  + "\n")
     tags_gen.end()
-
-
 
     # Set enviroment
     tags_gen.start("Set enviroment")
